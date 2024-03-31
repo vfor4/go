@@ -4,14 +4,10 @@ import (
 	"context"
 	"fmt"
 	"os"
+	"rworld/dto"
 
 	"github.com/jackc/pgx/v5"
 )
-
-type Account struct {
-	Username string
-	Password string
-}
 
 func connect() *pgx.Conn {
 	urlExample := "postgres://postgres:postgres@localhost:5432/real_world"
@@ -23,17 +19,30 @@ func connect() *pgx.Conn {
 	return conn
 }
 
-func GetAccount(accountId string) *Account {
+func GetAccount(email string) *dto.User {
 	conn := connect()
 	defer conn.Close(context.Background())
-	var user Account
+	var user dto.User
 	err := conn.
-		QueryRow(context.Background(), "select username, password from accounts where username=$1", accountId).
-		Scan(&user.Username, &user.Password)
+		QueryRow(context.Background(), "select email, username from accounts where email=$1", email).
+		Scan(&user.Email, &user.Username)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
-		return nil
 	}
-	fmt.Printf(user.Username)
 	return &user
+}
+
+func UserExists(loginInfo *dto.LoginInfo) bool {
+	conn := connect()
+	defer conn.Close(context.Background())
+	var exits int
+	query := "select 1 from accounts where email=$1 and password=$2"
+	err := conn.
+		QueryRow(context.Background(), query, loginInfo.Email, loginInfo.Password).
+		Scan(&exits)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "QueryRow failed: %v\n", err)
+		return false
+	}
+	return true
 }

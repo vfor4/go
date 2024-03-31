@@ -1,4 +1,4 @@
-module example/data-access
+module rworld
 
 go 1.22.1
 
