@@ -11,9 +11,12 @@ import (
 
 func GetAccount() {
 	const API_URL = "api"
-	http.HandleFunc(fmt.Sprintf("/%s/user", API_URL), handler)
+	mux := http.NewServeMux()
+	mux.HandleFunc(fmt.Sprintf("/%s/user", API_URL), handler)
 
-	http.ListenAndServe(":8080", nil)
+	filter := NewFilter(mux)
+
+	http.ListenAndServe(":8080", filter)
 }
 
 func handler(w http.ResponseWriter, r *http.Request) {
