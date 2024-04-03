@@ -10,25 +10,18 @@ import (
 )
 
 func GetAccount() {
-	const API_URL = "api"
 	mux := http.NewServeMux()
-	mux.HandleFunc(fmt.Sprintf("/%s/user", API_URL), handler)
+	mux.HandleFunc("/api/users/login", loginHandler)
+	mux.HandleFunc("/api/user", handler)
 
 	filter := NewFilter(mux)
 
 	http.ListenAndServe(":8080", filter)
 }
 
-func handler(w http.ResponseWriter, r *http.Request) {
-	switch r.Method {
-	case "GET":
-		fmt.Println("GET")
-		w.Header().Set("Content-type", "application/json")
-		accountJson, _ := json.Marshal(service.GetAccount(r.URL.Query().Get("id")))
-		w.Write(accountJson)
-	case "POST":
-		fmt.Println("POST")
-		loginInfo, _ := postMethodHandler(r)
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "POST" {
+		loginInfo, _ := extractBody(r)
 		if service.Loggedin(*loginInfo) {
 			user := service.GetAccount(loginInfo.Email)
 			user.Token = service.GenerateJWT(loginInfo.Email)
@@ -40,7 +33,17 @@ func handler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func postMethodHandler(r *http.Request) (*dto.LoginInfo, error) {
+func handler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == "GET" {
+		w.Header().Set("Content-type", "application/json")
+		accountJson, _ := json.Marshal(service.GetAccount(service.GetUser()))
+		w.Write(accountJson)
+	} else {
+		w.WriteHeader(405)
+	}
+}
+
+func extractBody(r *http.Request) (*dto.LoginInfo, error) {
 	bodyBytes, err := io.ReadAll(r.Body)
 	if err != nil {
 		fmt.Printf("Body reading error: %v", err)

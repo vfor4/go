@@ -13,11 +13,15 @@ type Filter struct {
 }
 
 func (f *Filter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	if user := service.ParseJWT(strings.Split(r.Header.Get("Authorization"), " ")[1]); user != "" {
+	log.Printf("Fiter for url: %s", r.URL.EscapedPath())
+	if inWhiteList := strings.HasSuffix(r.URL.EscapedPath(), "users/login"); inWhiteList {
 		f.handler.ServeHTTP(w, r)
 	} else {
-		log.Println("Token is invalid")
-		fmt.Fprint(w, "Somehow the token is invalid, try hard next time!")
+		if service.TokenValid(strings.Split(r.Header.Get("Authorization"), " ")[1]) {
+			f.handler.ServeHTTP(w, r)
+		} else {
+			fmt.Fprint(w, "Somehow the token is invalid, try harder next time!")
+		}
 	}
 }
 

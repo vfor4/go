@@ -7,6 +7,12 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
+var user string
+
+func GetUser() string {
+	return user
+}
+
 func GenerateJWT(email string) string {
 	// key, err := os.ReadFile("/home/vu/coding/go/keys/private_key.pem")
 	key := []byte("happy new year")
@@ -23,7 +29,7 @@ func GenerateJWT(email string) string {
 	return s
 }
 
-func ParseJWT(bearerToken string) string {
+func TokenValid(bearerToken string) bool {
 	token, err := jwt.Parse(bearerToken, func(t *jwt.Token) (interface{}, error) {
 		if _, ok := t.Method.(*jwt.SigningMethodHMAC); !ok {
 			return nil, fmt.Errorf("Unexpected signing method: %v", t.Header["alg"])
@@ -33,13 +39,14 @@ func ParseJWT(bearerToken string) string {
 	}, jwt.WithExpirationRequired(), jwt.WithIssuer("localhost.com"))
 	if err != nil {
 		fmt.Printf("cannot parse jwt, %v", err)
-		return ""
+		return false
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		return claims["sub"].(string)
+		user = claims["sub"].(string)
+		return true
 	}
-	return ""
+	return false
 }
 
 // func BytesToPrivateKey(key []byte) *rsa.PrivateKey {
