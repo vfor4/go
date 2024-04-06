@@ -2,6 +2,7 @@ package repo
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"rworld/dto"
@@ -10,8 +11,8 @@ import (
 )
 
 func connect() *pgx.Conn {
-	urlExample := "postgres://postgres:postgres@localhost:5432/real_world"
-	conn, err := pgx.Connect(context.Background(), urlExample)
+	url := "postgres://postgres:postgres@localhost:5432/real_world"
+	conn, err := pgx.Connect(context.Background(), url)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "Unable to connect to database: %v\n", err)
 		os.Exit(1)
@@ -45,4 +46,32 @@ func UserExists(loginInfo *dto.LoginInfo) bool {
 		return false
 	}
 	return true
+}
+
+func userExistsByEmail(email string) bool {
+	conn := connect()
+	defer conn.Close(context.Background())
+	var exits int
+	query := "select 1 from accounts where email=$1"
+	err := conn.
+		QueryRow(context.Background(), query, email).
+		Scan(&exits)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "userExistsByEmail - QueryRow failed: %v\n", err)
+		return false
+	}
+	return true
+}
+
+func SignUp(user *dto.SignUpUser) error {
+	if userExistsByEmail(user.Email) {
+		return errors.New("Signup email is already exits'")
+	}
+	pgx.BeginFunc(context.Background(), connect(), func(tx pgx.Tx) error {
+		_, err := tx.
+			Conn().
+			Exec(context.Background(), "insert into accounts(username, password, email) values ($1, $2, $3)", user.Username, user.Password, user.Email)
+		return err
+	})
+	return nil
 }

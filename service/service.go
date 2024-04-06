@@ -12,3 +12,7 @@ func GetAccount(username string) *dto.User {
 func Loggedin(loginInfo dto.LoginInfo) bool {
 	return repo.UserExists(&loginInfo)
 }
+
+func SignUp(user dto.SignUpUser) error {
+	return repo.SignUp(&user)
+}

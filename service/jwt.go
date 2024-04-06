@@ -7,10 +7,10 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var user string
+var email string
 
-func GetUser() string {
-	return user
+func GetEmail() string {
+	return email
 }
 
 func GenerateJWT(email string) string {
@@ -43,7 +43,7 @@ func TokenValid(bearerToken string) bool {
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		user = claims["sub"].(string)
+		email = claims["sub"].(string)
 		return true
 	}
 	return false
