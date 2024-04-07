@@ -24,7 +24,7 @@ func inWhiteList(url string) bool {
 }
 
 func (f *Filter) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	log.Printf("Fiter for url: %s", r.URL.EscapedPath())
+	log.Printf("Fiter for url: %s - %s", r.Method, r.URL.EscapedPath())
 	if inWhiteList(r.URL.EscapedPath()) {
 		f.handler.ServeHTTP(w, r)
 	} else {

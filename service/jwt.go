@@ -7,18 +7,18 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var email string
+var sub string
 
-func GetEmail() string {
-	return email
+func GetSubject() string {
+	return sub
 }
 
-func GenerateJWT(email string) string {
+func GenerateJWT(username string) string {
 	// key, err := os.ReadFile("/home/vu/coding/go/keys/private_key.pem")
 	key := []byte("happy new year")
 	t := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"sub": email,
+			"sub": username,
 			"iss": "localhost.com",
 			"exp": time.Now().Add(time.Minute * 30).Unix(),
 		})
@@ -43,7 +43,7 @@ func TokenValid(bearerToken string) bool {
 	}
 
 	if claims, ok := token.Claims.(jwt.MapClaims); ok {
-		email = claims["sub"].(string)
+		sub = claims["sub"].(string)
 		return true
 	}
 	return false
