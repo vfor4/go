@@ -24,9 +24,3 @@ func SignUp(user dto.SignUpUser) error {
 func UpdateUser(user dto.User) error {
 	return repo.UpdateUser(user)
 }
-
-func WrapJson(name string, item interface{}) map[string]interface{} {
-	return map[string]interface{}{
-		name: item,
-	}
-}

@@ -1,14 +1,20 @@
 package dto
 
 type User struct {
-	Id        int    `json:"-"`
-	Email     string `json:"email"`
-	Password  string `json:"-"`
+	Id       int    `json:"-"`
+	Email    string `json:"email"`
+	Password string `json:"-"`
+	Username string `json:"username"`
+	Token    string `json:"token"`
+	Bio      string `json:"bio"`
+	Image    string `json:"image"`
+}
+
+type Profile struct {
 	Username  string `json:"username"`
-	Token     string `json:"token"`
 	Bio       string `json:"bio"`
 	Image     string `json:"image"`
-	Following bool   `json:"following,omitempty"`
+	Following bool   `json:"following"`
 }
 
 type Follower struct {

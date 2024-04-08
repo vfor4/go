@@ -12,7 +12,9 @@ func Start() {
 	mux.HandleFunc("/api/users/login", loginHandler)
 	mux.HandleFunc("/api/users", signupHandler)
 	mux.HandleFunc("/api/user", userHandler)
+
 	mux.HandleFunc("/api/profiles/{username}", profileHandler)
+	mux.HandleFunc("/api/profiles/{username}/follow", followerHandler)
 
 	filter := NewFilter(mux)
 
