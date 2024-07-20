@@ -1,6 +1,7 @@
 package service
 
 import (
+	"fmt"
 	"rworld/dto"
 	"rworld/repo"
 )
@@ -14,6 +15,7 @@ func GetProfile(username string) dto.Profile {
 }
 
 func Follow(username string) error {
+	fmt.Print()
 	return repo.Follow(username, GetSubject())
 }
 

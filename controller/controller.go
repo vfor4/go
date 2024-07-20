@@ -15,6 +15,7 @@ func Start() {
 
 	mux.HandleFunc("/api/profiles/{username}", profileHandler)
 	mux.HandleFunc("/api/profiles/{username}/follow", followerHandler)
+	mux.HandleFunc("/api/articles", acticleHandler)
 
 	filter := NewFilter(mux)
 
